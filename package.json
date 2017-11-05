@@ -1,0 +1,22 @@
+{
+  "name": "bingoproject",
+  "version": "1.0.0",
+  "description": "bingo project",
+  "main": "index.html",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/P0SEID0N/BingoProject.git"
+  },
+  "author": "Stephen Krieg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/P0SEID0N/BingoProject/issues"
+  },
+  "homepage": "https://github.com/P0SEID0N/BingoProject#readme",
+  "dependencies": {
+    "angular": "^1.6.6"
+  }
+}
