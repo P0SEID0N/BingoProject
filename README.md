@@ -1,2 +1,2 @@
-# BingoProject
-Bingo Project
+# BowlingProject
+Bowling Project
