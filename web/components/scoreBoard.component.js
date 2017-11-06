@@ -70,6 +70,15 @@ angular.module('scoreBoard').component('scoreBoard', {
             }
         };
 
+        self.validateNumber = function(_value) {
+            if(isNaN(parseInt(_value))) {
+                return 0;
+            }
+            else {
+                return parseInt(_value);
+            }
+        };
+
         self.addGame = function (playerName) {
             //No validation required on game objects, or set counts. The only way a new game can be created is by the system. We dont need to validate automated elements, only player input.
             if (!angular.isUndefined(playerName)) {
@@ -176,9 +185,10 @@ angular.module('scoreBoard').component('scoreBoard', {
 
             angular.forEach(self.games[gameId].sets, function(set, key) {
                 if(setIndex < 9) {
+                    set.scoreTally = 0;
                     //if we have a spare or a strike
                     if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
-                        set.scoreTally += 10;
+                        set.scoreTally = 10;
                         if(self.validateSpare(set.second)) {
                             set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
                         }
@@ -187,15 +197,108 @@ angular.module('scoreBoard').component('scoreBoard', {
                         }
                     }
                     else if(set.first !== ''){
-                        set.scoreTally +=parseInt(set.first);
-                        if(set.second !== '' && (!self.validateStrike(set.second) && ! self.validateSpare(set.second))) {
-                            set.scoreTally += parseInt(set.second);
+                        //set.scoreTally = parseInt(set.first);
+                        if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
+                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
+                        }
+                        else if(self.validateSpare(set.second)) {
+                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
                         }
                     }
 
-                    self.games[gameId].total += set.scoreTally;
-                    set.setTotal = set.scoreTally;
+
+                    if(key === 0) {
+                        set.setTotal = set.scoreTally;
+                    }
+                    else {
+                        if(set.first !== '' || set.second !== '') {
+                            set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
+                        }
+                    }
+
+
+
                 }
+                else {
+
+                    if(key === 8) {
+                    if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
+                        set.scoreTally = 10;
+                        if(self.validateSpare(set.second)) {
+                            set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
+                        }
+                        else if(self.validateStrike(set.second)) {
+
+                            if(self.validateStrike(self.games[gameId].sets[key+1].first)) {
+                                set.scoreTally += 10;
+                                if(self.validateStrike(self.games[gameId].sets[key+1].second)) {
+                                    set.scoreTally += 10;
+                                }
+                                else {
+                                    set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].second);
+                                }
+                            }
+                            else {
+                                if(self.validateSpare(self.games[gameId].sets[key+1].second)) {
+                                    set.scoreTally += 10;
+                                }
+                                else {
+                                    set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].first) + self.validateNumber(self.games[gameId].sets[key+1].second);
+                                }
+                            }
+
+
+                        }
+                    }
+                    else if(set.first !== ''){
+                        //set.scoreTally = parseInt(set.first);
+                        if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
+                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
+                        }
+                        else if(self.validateSpare(set.second)) {
+                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
+                        }
+                    }
+                }
+
+                    //if no strike or spare in 10th frame, then no bonus roll
+                   if((self.validateStrike(set.first) || self.validateStrike(set.second)) || self.validateSpare(set.second)) {
+                       //Bonus roll!
+                       if(self.validateStrike(set.first)) {
+                           set.scoreTally = 10;
+                           if(self.validateStrike(set.second)) {
+                               set.scoreTally += 10;
+                               if(self.validateStrike(set.third)) {
+                                   set.scoreTally += 10;
+                               }
+                           }
+                           else {
+                               set.scoreTally += parseInt(set.second);
+                               if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
+                                   set.scoreTally +=10;
+                               }
+                               else {
+                                   set.scoreTally += self.validateNumber(parseInt(set.third));
+                               }
+                           }
+                       }
+                       else if(set.first !== '' && self.validateSpare(set.second)) {
+                           set.scoreTally = 10;
+                           if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
+                               set.scoreTally +=10;
+                           }
+                       }
+                   }
+                   else {
+                       set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
+                   }
+                    if(key !== 0) {
+                        set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
+                    }
+
+                }
+
+                console.log(set.scoreTally);
 
 
             });
@@ -217,7 +320,7 @@ angular.module('scoreBoard').component('scoreBoard', {
                 if(typeof nextIndex !== 'undefined') {
 
                     if (nextIndex.first !== '') {
-                        throw1Value = parseInt(nextIndex.first);
+                        throw1Value = self.validateNumber(parseInt(nextIndex.first));
                     }
                     else {
                         if (nextIndex.second !== '') {
@@ -236,9 +339,13 @@ angular.module('scoreBoard').component('scoreBoard', {
                 if(typeof nextIndex !== 'undefined'){
 
                     if(nextIndex.first !== '') {
-                        throw1Value = parseInt(nextIndex.first);
-                        if(nextIndex.second !== '') {
-                            throw2Value = parseInt(nextIndex.second);
+                        throw1Value = self.validateNumber(parseInt(nextIndex.first));
+                        if(nextIndex.second !== '' && !self.validateSpare(nextIndex.second)) {
+                            throw2Value = self.validateNumber(parseInt(nextIndex.second));
+                        }
+                        else {
+                            //it is a spare
+                            throw2Value = 10;
                         }
                     }
                     else {
@@ -247,10 +354,10 @@ angular.module('scoreBoard').component('scoreBoard', {
                                 throw1Value = 10;
                                 if(typeof nextNextIndex !== 'undefined') {
                                     if(nextNextIndex.first !== '') {
-                                        throw2Value = parseInt(nextNextIndex.first);
+                                        throw2Value = self.validateNumber(parseInt(nextNextIndex.first));
                                     }
                                     else {
-                                        if(self.validateSpare(nextNexIndex.second) || self.validateStrike(nextNextIndex.second)) {
+                                        if(self.validateSpare(nextNextIndex.second) || self.validateStrike(nextNextIndex.second)) {
                                             throw2Value = 10;
                                         }
                                     }
