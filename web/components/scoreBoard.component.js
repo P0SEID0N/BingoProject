@@ -112,7 +112,9 @@ angular.module('scoreBoard').component('scoreBoard', {
 
             let set = self.games[gameId].sets[setIndex];
 
+
             if (self.validateGameInput(newScore)) {
+
                 if (setPosition === 1) {
                     //If the newScore is a /(spare) that is incorrect, first index cannot be a spare
                     if (newScore === '/') {
@@ -228,6 +230,7 @@ angular.module('scoreBoard').component('scoreBoard', {
                             set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
                         }
                         else if(self.validateStrike(set.second)) {
+                            set.scoreTally = 10;
 
                             if(self.validateStrike(self.games[gameId].sets[key+1].first)) {
                                 set.scoreTally += 10;
@@ -265,7 +268,7 @@ angular.module('scoreBoard').component('scoreBoard', {
                    if((self.validateStrike(set.first) || self.validateStrike(set.second)) || self.validateSpare(set.second)) {
                        //Bonus roll!
                        if(self.validateStrike(set.first)) {
-                           set.scoreTally = 10;
+                           set.scoreTally += 10;
                            if(self.validateStrike(set.second)) {
                                set.scoreTally += 10;
                                if(self.validateStrike(set.third)) {
@@ -273,7 +276,8 @@ angular.module('scoreBoard').component('scoreBoard', {
                                }
                            }
                            else {
-                               set.scoreTally += parseInt(set.second);
+                               set.scoreTally += self.validateNumber(parseInt(set.second));
+                               console.log(self.validateNumber(parseInt(set.second)));
                                if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
                                    set.scoreTally +=10;
                                }
@@ -373,7 +377,132 @@ angular.module('scoreBoard').component('scoreBoard', {
             }
 
             return throw1Value + throw2Value;
-        }
+        };
+
+        //self.parseSets = function(gameId) {
+//
+        //    angular.forEach(self.games[gameId].sets, function(set, key) {
+        //        if(setIndex < 9) {
+        //            set.scoreTally = 0;
+        //            //if we have a spare or a strike
+        //            if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
+        //                set.scoreTally = 10;
+        //                if(self.validateSpare(set.second)) {
+        //                    set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
+        //                }
+        //                else if(self.validateStrike(set.second)) {
+        //                    set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, key, 2);
+        //                }
+        //            }
+        //            else if(set.first !== ''){
+        //                //set.scoreTally = parseInt(set.first);
+        //                if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
+        //                    set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
+        //                }
+        //                else if(self.validateSpare(set.second)) {
+        //                    set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
+        //                }
+        //            }
+//
+//
+        //            if(key === 0) {
+        //                set.setTotal = set.scoreTally;
+        //            }
+        //            else {
+        //                if(set.first !== '' || set.second !== '') {
+        //                    set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
+        //                }
+        //            }
+//
+//
+//
+        //        }
+        //        else {
+//
+        //            if(key === 8) {
+        //                if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
+        //                    set.scoreTally = 10;
+        //                    if(self.validateSpare(set.second)) {
+        //                        set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
+        //                    }
+        //                    else if(self.validateStrike(set.second)) {
+//
+        //                        if(self.validateStrike(self.games[gameId].sets[key+1].first)) {
+        //                            set.scoreTally += 10;
+        //                            if(self.validateStrike(self.games[gameId].sets[key+1].second)) {
+        //                                set.scoreTally += 10;
+        //                            }
+        //                            else {
+        //                                set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].second);
+        //                            }
+        //                        }
+        //                        else {
+        //                            if(self.validateSpare(self.games[gameId].sets[key+1].second)) {
+        //                                set.scoreTally += 10;
+        //                            }
+        //                            else {
+        //                                set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].first) + self.validateNumber(self.games[gameId].sets[key+1].second);
+        //                            }
+        //                        }
+//
+//
+        //                    }
+        //                }
+        //                else if(set.first !== ''){
+        //                    //set.scoreTally = parseInt(set.first);
+        //                    if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
+        //                        set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
+        //                    }
+        //                    else if(self.validateSpare(set.second)) {
+        //                        set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
+        //                    }
+        //                }
+        //            }
+//
+        //            //if no strike or spare in 10th frame, then no bonus roll
+        //            if((self.validateStrike(set.first) || self.validateStrike(set.second)) || self.validateSpare(set.second)) {
+        //                //Bonus roll!
+        //                if(self.validateStrike(set.first)) {
+        //                    set.scoreTally = 10;
+        //                    if(self.validateStrike(set.second)) {
+        //                        set.scoreTally += 10;
+        //                        if(self.validateStrike(set.third)) {
+        //                            set.scoreTally += 10;
+        //                        }
+        //                    }
+        //                    else {
+        //                        set.scoreTally += parseInt(set.second);
+        //                        if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
+        //                            set.scoreTally +=10;
+        //                        }
+        //                        else {
+        //                            set.scoreTally += self.validateNumber(parseInt(set.third));
+        //                        }
+        //                    }
+        //                }
+        //                else if(set.first !== '' && self.validateSpare(set.second)) {
+        //                    set.scoreTally = 10;
+        //                    if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
+        //                        set.scoreTally +=10;
+        //                    }
+        //                }
+        //            }
+        //            else {
+        //                set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
+        //            }
+        //            if(key !== 0) {
+        //                set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
+        //            }
+//
+        //        }
+//
+        //        console.log(set.scoreTally);
+//
+//
+        //    });
+
+            //The 10th set will work differently
+       // }
 
 
     }
