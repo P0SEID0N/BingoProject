@@ -25,63 +25,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="game col-md-12" ng-repeat="(i,game) in $ctrl.games track by $index">
+                    <div class="game col-md-12" ng-repeat="(i,game) in $ctrl.game track by $index">
                         <div class="playerName col-md-2">
                             <div class="col-md-12">{{game.playerName}}</div>
                         </div>
                         <div class="scores col-md-10">
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[0].first" ng-value="$ctrl.games[i].sets[0].first" ng-change="$ctrl.updateSetScore(game.gameId,0,1,$ctrl.games[i].sets[0].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[0].second" ng-value="$ctrl.games[i].sets[0].second" ng-change="$ctrl.updateSetScore(game.gameId,0,2,$ctrl.games[i].sets[0].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[0].setTotal}}</div>
+                            <div class="set" ng-repeat="frame in game.frames track by $index" ng-class="frame.frameNum == 9 ? 'col-md-2' : 'col-md-1'">
+                                <input ng-class="frame.frameNum == 9 ? 'col-md-4' : 'col-md-6'" class="col-md-6 setUpper" ng-model="frame.throws.first"  ng-value="" ng-change="$ctrl.validateThrowInput(game, frame, 1, frame.throws.first)" />
+                                <input ng-class="frame.frameNum == 9 ? 'col-md-4' : 'col-md-6'" class="col-md-6 setUpper" ng-model="frame.throws.second" ng-value="" ng-change="$ctrl.validateThrowInput(game, frame, 2, frame.throws.second)" />
+                                <input ng-class="frame.frameNum == 9 ? 'col-md-4' : 'col-md-6'" class="setUpper" ng-model="frame.throws.third"  ng-value="" ng-change="$ctrl.validateThrowInput(game, frame, 3, frame.throws.third)" ng-if="frame.frameNum == 9" />
+                                <div class="col-md-12 setTotal">{{frame.score}}</div>
                             </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[1].first" value="$ctrl.games[i].sets[1].first" ng-change="$ctrl.updateSetScore(game.gameId,1,1,$ctrl.games[i].sets[1].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[1].second" value="$ctrl.games[i].sets[1].second" ng-change="$ctrl.updateSetScore(game.gameId,1,2,$ctrl.games[i].sets[1].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[1].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[2].first" value="$ctrl.games[i].sets[2].first" ng-change="$ctrl.updateSetScore(game.gameId,2,1,$ctrl.games[i].sets[2].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[2].second" value="$ctrl.games[i].sets[2].second" ng-change="$ctrl.updateSetScore(game.gameId,2,2,$ctrl.games[i].sets[2].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[2].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[3].first" value="$ctrl.games[i].sets[3].first" ng-change="$ctrl.updateSetScore(game.gameId,3,1,$ctrl.games[i].sets[3].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[3].second" value="$ctrl.games[i].sets[3].second" ng-change="$ctrl.updateSetScore(game.gameId,3,2,$ctrl.games[i].sets[3].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[3].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[4].first" value="$ctrl.games[i].sets[4].first" ng-change="$ctrl.updateSetScore(game.gameId,4,1,$ctrl.games[i].sets[4].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[4].second" value="$ctrl.games[i].sets[4].second" ng-change="$ctrl.updateSetScore(game.gameId,4,2,$ctrl.games[i].sets[4].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[4].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[5].first" value="$ctrl.games[i].sets[5].first" ng-change="$ctrl.updateSetScore(game.gameId,5,1,$ctrl.games[i].sets[5].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[5].second" value="$ctrl.games[i].sets[5].second" ng-change="$ctrl.updateSetScore(game.gameId,5,2,$ctrl.games[i].sets[5].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[5].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[6].first" value="$ctrl.games[i].sets[6].first" ng-change="$ctrl.updateSetScore(game.gameId,6,1,$ctrl.games[i].sets[6].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[6].second" value="$ctrl.games[i].sets[6].second" ng-change="$ctrl.updateSetScore(game.gameId,6,2,$ctrl.games[i].sets[6].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[6].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[7].first" value="$ctrl.games[i].sets[7].first" ng-change="$ctrl.updateSetScore(game.gameId,7,1,$ctrl.games[i].sets[7].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[7].second" value="$ctrl.games[i].sets[7].second" ng-change="$ctrl.updateSetScore(game.gameId,7,2,$ctrl.games[i].sets[7].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[7].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1 set">
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[8].first" value="$ctrl.games[i].sets[8].first" ng-change="$ctrl.updateSetScore(game.gameId,8,1,$ctrl.games[i].sets[8].first)" />
-                                <input class="col-md-6 setUpper" ng-model="$ctrl.games[i].sets[8].second" value="$ctrl.games[i].sets[8].second" ng-change="$ctrl.updateSetScore(game.gameId,8,2,$ctrl.games[i].sets[8].second)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[8].setTotal}}</div>
-                            </div>
-                            <div class="col-md-2 set">
-                                <input class="col-md-4 setUpper" ng-model="$ctrl.games[i].sets[9].first" value="$ctrl.games[i].sets[9].first" ng-change="$ctrl.updateSetScore(game.gameId,9,1,$ctrl.games[i].sets[9].first)" />
-                                <input class="col-md-4 setUpper" ng-model="$ctrl.games[i].sets[9].second" value="$ctrl.games[i].sets[9].second" ng-change="$ctrl.updateSetScore(game.gameId,9,2,$ctrl.games[i].sets[9].second)" />
-                                <input class="col-md-4 setUpper" ng-model="$ctrl.games[i].sets[9].third" value="$ctrl.games[i].sets[9].third" ng-change="$ctrl.updateSetScore(game.gameId,9,3,$ctrl.games[i].sets[9].third)" />
-                                <div class="col-md-12 setTotal">{{$ctrl.games[i].sets[9].setTotal}}</div>
-                            </div>
-                            <div class="col-md-1">{{$ctrl.games[i].total}}</div>
+
+                            <div class="col-md-1">Score</div>
                         </div>
                     </div>
                 </div>

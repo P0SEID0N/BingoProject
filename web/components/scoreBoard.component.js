@@ -6,35 +6,80 @@ angular.module('scoreBoard').component('scoreBoard', {
         let self = this;
 
         //self.player = "Stephen Krieg";
-        self.games = [];
+        self.game = [{
+            playerName: 'test',
+            frames:[],
+        }];
 
-        self.noGames = false;
+        self.game[1] = {
+            playerName: 'test2',
+            frames:[],
+        };
 
+        //This is game's structure
+        //self.game = [{
+        //    playerName: 'TEST',
+        //    frames: [{
+        //        throws: [{
+        //            first:0,
+        //            second:0,
+        //            third:0
+        //        }],
+        //        score: 0,
+        //        frameNum: 0
+        //    }]
+        //}];
         self.$onInit = function () {
-            if (self.games.length === 0) {
-                //we have no games, Remind user that they need to type their name to start one in the "available panel"
-                //self.noGames = true;
-                for (let i = 0; i <= 3; i++) {
-                    let test = {
-                        playerName: 'John',
-                        gameId: self.games.length,
-                        sets: [
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', setTotal: '', scoreTally: 0},
-                            {first: '', second: '', third: '', setTotal: '', scoreTally: 0},
-                        ],
-                        total: 0
-                    };
 
-                    self.games.push(test);
-                }
+
+
+            for(let i = 0; i<10; i++) {
+                let temp = {
+                    throws: {
+                        first:0,
+                        second:0,
+                        third:0
+                    },
+                    score: 0,
+                    frameNum: i
+                };
+
+                self.game[0].frames.push(temp);
+            }
+
+            for(let j = 0; j<10; j++) {
+                let temp = {
+                    throws: {
+                        first:0,
+                        second:0,
+                        third:0
+                    },
+                    score: 0,
+                    frameNum: j
+                };
+
+                self.game[1].frames.push(temp);
+            }
+
+
+
+        };
+
+        self.convertScoreValue = function(_value) {
+            if(!isNaN(_value)) {
+                return parseInt(_value);
+            }
+            else if (_value === 'X' || _value === 'x') {
+                return 10;
+            }
+            else if(_value === '/') {
+                return 10;
+            }
+            else if(_value === '-' || _value === 'F' || _value === 'f') {
+                return 0;
+            }
+            else {
+                return 0;
             }
         };
 
@@ -72,439 +117,181 @@ angular.module('scoreBoard').component('scoreBoard', {
 
         self.validateNumber = function(_value) {
             if(isNaN(parseInt(_value))) {
-                return 0;
+                return false;
             }
             else {
-                return parseInt(_value);
+                return true;
             }
         };
 
         self.addGame = function (playerName) {
-            //No validation required on game objects, or set counts. The only way a new game can be created is by the system. We dont need to validate automated elements, only player input.
-            if (!angular.isUndefined(playerName)) {
-                let temp = {
-                    playerName: playerName,
-                    gameId: self.games.length,
-                    sets: [
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', setTotal: '', scoreTally: 0},
-                        {first: '', second: '', third: '', setTotal: '', scoreTally: 0},
-                    ],
-                    total: 0
-                };
+        };
 
-                self.games.push(temp);
+        //calculate the values of the next two throws, add them and return.
+        self.nextTwoThrows = function(_currentGame, _currentFrameNum, _currentFrameThrowNum) {
+
+            let nextThrowScore = 0;
+            let nextNextThrowScore = 0;
+
+            if(_currentFrameThrowNum === 1) {
+                //FirstThrow
+                nextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum].throws.second);
+
+                //If the next frame has a strike we cannot count the first throw as a value, we need to count only the second.
+                if(!self.validateStrike(_currentGame.frames[_currentFrameNum + 1].throws.second)) {
+                    nextNextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.first);
+                }
+                //If the next frame has a strike in it, we want to count the strike value not the throws.first value
+                else {
+                    nextNextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.second);
+                }
             }
+            //If we are calculating starting from the throws.second position
             else {
-                //Errorhandler->throw(new Error('You must provide a player name in order to create a game'));
-            }
-        };
-
-        //Validation and update of setScores
-        self.updateSetScore = function (gameId, setIndex, setPosition, newScore) {
-
-            let set = self.games[gameId].sets[setIndex];
-
-
-            if (self.validateGameInput(newScore)) {
-
-                if (setPosition === 1) {
-                    //If the newScore is a /(spare) that is incorrect, first index cannot be a spare
-                    if (newScore === '/') {
-                        self.games[gameId].sets[setIndex].first = '';
-                    }
-                    //if we get a strike in first frame, we dont get a second shot.
-                    else if (newScore === 'X' || newScore === 'x' && setIndex !== 9) {
-                        self.games[gameId].sets[setIndex].first = '';
-                        self.games[gameId].sets[setIndex].second = newScore;
-                    }
-                    else if (set.second === 'x' || set.second === 'X') {
-                        self.games[gameId].sets[setIndex].first = '';
-                    }
-                    else {
-                        self.games[gameId].sets[setIndex].first = newScore;
-
-                    }
+                //If the next frame has a strike, we need to count that value
+                if(!self.validateStrike(_currentGame.frames[_currentFrameNum + 1].throws.second)) {
+                    nextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.first);
+                    nextNextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.second);
                 }
-                else if (setPosition === 2) {
-                    //If the newScore is a X(strike) we need to clear first set.first value and X set.second unless we are in the 10th frame
-                    if (newScore === 'X' || newScore === 'x' && setIndex !== 9) {
-                        self.games[gameId].sets[setIndex].first = '';
-                        self.games[gameId].sets[setIndex].second = newScore;
-
-                    }
-                    else if(newScore === '/') {
-                        self.games[gameId].sets[setIndex].second = newScore;
-                    }
-                    else {
-                        self.games[gameId].sets[setIndex].second = newScore;
-
-                    }
-                }
-                else if (setPosition === 3 && setIndex === 9) {
-                    //if there is no X(strike) or /(spare) in 10th frame, bonus roll is NULL
-                    if (newScore !== '' && ((set.first === 'x' || set.first === 'X' || set.first === '/') || (set.second === 'x' || set.second === 'X' || set.second === '/'))) {
-                        self.games[gameId].sets[setIndex].third = newScore;
-
-                    }
-                    else {
-                        self.games[gameId].sets[setIndex].third = '';
-                    }
-
-                }
+                //If the next frame has a strike in it, we want to count the strike value not the throws.first value
                 else {
-                    //Errorhandler->throw(new Error('There should be no THIRD value for this setIndex'));
-                }
-                //initiateParse of game totals.
-                self.parseSets(gameId, setIndex, newScore);
-            }
-            else {
-                if (setPosition === 1) {
-                    self.games[gameId].sets[setIndex].first = '';
-                }
-                else if (setPosition === 2) {
-                    self.games[gameId].sets[setIndex].second = '';
-                }
-                else if (setPosition === 3 && setIndex === 9) {
-                    self.games[gameId].sets[setIndex].third = '';
-                }
-                else {
-                    //Errorhandler->throw(new Error('There should be no THIRD value for this setIndex'));
-                }
-            }
+                    nextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.second);
 
-
-        };
-
-        self.parseSets = function (gameId, setIndex, newScore) {
-
-            angular.forEach(self.games[gameId].sets, function(set, key) {
-                if(setIndex < 9) {
-                    set.scoreTally = 0;
-                    //if we have a spare or a strike
-                    if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
-                        set.scoreTally = 10;
-                        if(self.validateSpare(set.second)) {
-                            set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
-                        }
-                        else if(self.validateStrike(set.second)) {
-                            set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, key, 2);
-                        }
-                    }
-                    else if(set.first !== ''){
-                        //set.scoreTally = parseInt(set.first);
-                        if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
-                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
-                        }
-                        else if(self.validateSpare(set.second)) {
-                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
-                        }
-                    }
-
-
-                    if(key === 0) {
-                        set.setTotal = set.scoreTally;
-                    }
-                    else {
-                        if(set.first !== '' || set.second !== '') {
-                            set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
-                        }
-                    }
-
-
-
-                }
-                else {
-
-                    if(key === 8) {
-                    if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
-                        set.scoreTally = 10;
-                        if(self.validateSpare(set.second)) {
-                            set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
-                        }
-                        else if(self.validateStrike(set.second)) {
-                            set.scoreTally = 10;
-
-                            if(self.validateStrike(self.games[gameId].sets[key+1].first)) {
-                                set.scoreTally += 10;
-                                if(self.validateStrike(self.games[gameId].sets[key+1].second)) {
-                                    set.scoreTally += 10;
-                                }
-                                else {
-                                    set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].second);
-                                }
-                            }
-                            else {
-                                if(self.validateSpare(self.games[gameId].sets[key+1].second)) {
-                                    set.scoreTally += 10;
-                                }
-                                else {
-                                    set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].first) + self.validateNumber(self.games[gameId].sets[key+1].second);
-                                }
-                            }
-
-
-                        }
-                    }
-                    else if(set.first !== ''){
-                        //set.scoreTally = parseInt(set.first);
-                        if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
-                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
-                        }
-                        else if(self.validateSpare(set.second)) {
-                            set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
-                        }
-                    }
-                }
-
-                    //if no strike or spare in 10th frame, then no bonus roll
-                   if((self.validateStrike(set.first) || self.validateStrike(set.second)) || self.validateSpare(set.second)) {
-                       //Bonus roll!
-                       if(self.validateStrike(set.first)) {
-                           set.scoreTally += 10;
-                           if(self.validateStrike(set.second)) {
-                               set.scoreTally += 10;
-                               if(self.validateStrike(set.third)) {
-                                   set.scoreTally += 10;
-                               }
-                           }
-                           else {
-                               set.scoreTally += self.validateNumber(parseInt(set.second));
-                               console.log(self.validateNumber(parseInt(set.second)));
-                               if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
-                                   set.scoreTally +=10;
-                               }
-                               else {
-                                   set.scoreTally += self.validateNumber(parseInt(set.third));
-                               }
-                           }
-                       }
-                       else if(set.first !== '' && self.validateSpare(set.second)) {
-                           set.scoreTally = 10;
-                           if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
-                               set.scoreTally +=10;
-                           }
-                       }
-                   }
-                   else {
-                       set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
-                   }
-                    if(key !== 0) {
-                        set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
-                    }
-
-                }
-
-                console.log(set.scoreTally);
-
-
-            });
-
-            //The 10th set will work differently
-        };
-
-        self.returnTotalScoreForNextThrowInterval = function(gameId, startIndex, throwIndex) {
-            //startIndex = current index that we are polling from
-            //throwIndex = how many throws in the future we want to parse, meaning. If throwIndex is 2, then we want to take scores from the next TWO values.
-
-            let throw1Value = 0;
-            let throw2Value = 0;
-
-            //This is to check SPARES
-            if(throwIndex === 1) {
-                let nextIndex = self.games[gameId].sets[startIndex+1];
-
-                if(typeof nextIndex !== 'undefined') {
-
-                    if (nextIndex.first !== '') {
-                        throw1Value = self.validateNumber(parseInt(nextIndex.first));
-                    }
-                    else {
-                        if (nextIndex.second !== '') {
-                            if (self.validateSpare(nextIndex.second) || self.validateStrike(nextIndex.second)) {
-                                throw1Value = 10;
-                            }
-                        }
-                    }
-                }
-
-            }
-            else if(throwIndex === 2) {
-                let nextIndex = self.games[gameId].sets[startIndex+1];
-                let nextNextIndex = self.games[gameId].sets[startIndex+2];
-
-                if(typeof nextIndex !== 'undefined'){
-
-                    if(nextIndex.first !== '') {
-                        throw1Value = self.validateNumber(parseInt(nextIndex.first));
-                        if(nextIndex.second !== '' && !self.validateSpare(nextIndex.second)) {
-                            throw2Value = self.validateNumber(parseInt(nextIndex.second));
+                    //Now we need to check the NextNEXT frame, for a strike.
+                    //IMPORTANT: we need to catch the 9th Frame here, because we cant parse by two, so for the 9th frame, we need to count the throw.third instead.
+                    if(_currentFrameNum < 8) {
+                        if(!self.validateStrike(_currentGame.frames[_currentFrameNum + 2].throws.second)) {
+                            nextNextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 2].throws.first);
                         }
                         else {
-                            //it is a spare
-                            throw2Value = 10;
+                            nextNextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 2].throws.second)
+                        }
+                    }
+                    //IF we are on frame 9, we need to count first and second, no questions, they are guaranteed throws.
+                    else {
+                        nextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.first);
+                        nextNextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.second);
+                    }
+
+                }
+            }
+
+            return nextThrowScore + nextNextThrowScore;
+
+        };
+
+        //calculate value of the next throw and return.
+        self.nextThrow = function(_currentGame, _currentFrameNum, _currentFrameThrowNum) {
+
+            let nextThrowScore = 0;
+
+            if(_currentFrameThrowNum === 1) {
+                nextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum].throws.second);
+            }
+            else {
+                //If next frame has a strike, we want to count that instead.
+                if(!self.validateStrike(_currentGame.frames[_currentFrameNum + 1].throws.second)) {
+                    nextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.first);
+                }
+                else {
+                    nextThrowScore = self.convertScoreValue(_currentGame.frames[_currentFrameNum + 1].throws.second);
+                }
+            }
+
+            return nextThrowScore;
+        };
+
+        //This will go through all of the frames, and all of the frame scores (CALLED ON EVERY UPDATE)
+        self.evaluateFrameScores = function() {
+            angular.forEach(self.game, function(game, key) {
+               angular.forEach(game.frames, function(frame, key2) {
+                   //START INTERNAL SCORING
+                       frame.score = self.convertScoreValue(frame.throws.first) + self.convertScoreValue(frame.throws.second) + self.convertScoreValue(frame.throws.third);
+                   //END INTERNAL SCORING
+
+                   //EVALUATE SCORES THAT NEED TO TAKE OTHER SCORES INTO ACCOUNT
+                   //Spares and strikes will only ever show up in the second throw, so we dont need to account for first
+                   //Last frame will never need to calculate against future scores
+                   if(frame.frameNum !== 9) {
+                       if(self.validateStrike(frame.throws.second) || self.validateSpare(frame.throws.second)) {
+                           //If the throw is a strike, we need the two next throws.
+                           if(self.validateStrike(frame.throws.second)) {
+                               //console.log(game.frames);
+                               frame.score += self.nextTwoThrows(game, frame.frameNum, 2);
+                           }
+                           else if(self.validateSpare(frame.throws.second)) {
+                               //Spares are worth 10 points in this system, but in reality it is supposed to be the difference between the first shot and 10 points, therefore making the entire set worth 10. So we need to subtract some here.
+                               frame.score -= self.convertScoreValue(frame.throws.first);
+
+                               frame.score += self.nextThrow(game, frame.frameNum, 2);
+                           }
+                       }
+                   }
+
+                   //Now we need to take the previous frame score into account.
+
+                   if(frame.frameNum > 0) {
+                       frame.score += self.convertScoreValue(game.frames[frame.frameNum - 1].score);
+                   }
+               });
+            });
+        };
+
+        self.validateThrowInput = function(_currentGame, _currentFrame, _currentFrameThrowNum, _newThrowValue) {
+
+            //FIRST THROW SLOT
+            if(_currentFrameThrowNum === 1) {
+
+                //Parse values and only keep the ones we want.
+                if(self.validateGameInput(_newThrowValue)) {
+                    //Spare and strike symbols cannot go into the first slot
+                    if((self.validateStrike(_newThrowValue) || self.validateSpare(_newThrowValue)) && _currentFrame.frameNum < 9) {
+                        if(self.validateStrike(_newThrowValue)) {
+                            _currentFrame.throws.first = undefined;
+                            _currentFrame.throws.second = _newThrowValue;
+                        }
+                        else if(self.validateSpare(_newThrowValue)) {
+                            _currentFrame.throws.first = undefined;
                         }
                     }
                     else {
-                        if(nextIndex.second !== '') {
-                            if(self.validateStrike(nextIndex.second) || self.validateSpare(nextIndex.second)) {
-                                throw1Value = 10;
-                                if(typeof nextNextIndex !== 'undefined') {
-                                    if(nextNextIndex.first !== '') {
-                                        throw2Value = self.validateNumber(parseInt(nextNextIndex.first));
-                                    }
-                                    else {
-                                        if(self.validateSpare(nextNextIndex.second) || self.validateStrike(nextNextIndex.second)) {
-                                            throw2Value = 10;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        _currentFrame.throws.first = _newThrowValue;
                     }
+                }
+                else {
+                    _currentFrame.throws.first = undefined;
                 }
 
             }
+            else if(_currentFrameThrowNum === 2) {
+
+                if(self.validateGameInput(_newThrowValue)) {
+                    if(self.validateSpare(_newThrowValue) || self.validateStrike(_newThrowValue)) {
+                        _currentFrame.throws.second = _newThrowValue;
+                    }
+                }
+                else {
+                    _currentFrame.throws.second = undefined;
+                }
+            }
+            else if(_currentFrameThrowNum === 3) {
+                if(self.validateGameInput(_newThrowValue)) {
+                    _currentFrame.throws.third = _newThrowValue;
+                }
+                else {
+                    _currentFrame.throws.third = undefined;
+                }
+            }
             else {
-                //IDK it should never not be one of the two above.
+                _currentFrame.throws.first = undefined;
+                _currentFrame.throws.second = undefined;
+                _currentFrame.throws.third = undefined;
+
             }
 
-            return throw1Value + throw2Value;
-        };
+            self.evaluateFrameScores();
 
-        //self.parseSets = function(gameId) {
-//
-        //    angular.forEach(self.games[gameId].sets, function(set, key) {
-        //        if(setIndex < 9) {
-        //            set.scoreTally = 0;
-        //            //if we have a spare or a strike
-        //            if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
-        //                set.scoreTally = 10;
-        //                if(self.validateSpare(set.second)) {
-        //                    set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
-        //                }
-        //                else if(self.validateStrike(set.second)) {
-        //                    set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, key, 2);
-        //                }
-        //            }
-        //            else if(set.first !== ''){
-        //                //set.scoreTally = parseInt(set.first);
-        //                if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
-        //                    set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
-        //                }
-        //                else if(self.validateSpare(set.second)) {
-        //                    set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, key, 1);
-        //                }
-        //            }
-//
-//
-        //            if(key === 0) {
-        //                set.setTotal = set.scoreTally;
-        //            }
-        //            else {
-        //                if(set.first !== '' || set.second !== '') {
-        //                    set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
-        //                }
-        //            }
-//
-//
-//
-        //        }
-        //        else {
-//
-        //            if(key === 8) {
-        //                if(set.first === '' && (self.validateStrike(set.second) || self.validateSpare(set.second))) {
-        //                    set.scoreTally = 10;
-        //                    if(self.validateSpare(set.second)) {
-        //                        set.scoreTally += self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
-        //                    }
-        //                    else if(self.validateStrike(set.second)) {
-//
-        //                        if(self.validateStrike(self.games[gameId].sets[key+1].first)) {
-        //                            set.scoreTally += 10;
-        //                            if(self.validateStrike(self.games[gameId].sets[key+1].second)) {
-        //                                set.scoreTally += 10;
-        //                            }
-        //                            else {
-        //                                set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].second);
-        //                            }
-        //                        }
-        //                        else {
-        //                            if(self.validateSpare(self.games[gameId].sets[key+1].second)) {
-        //                                set.scoreTally += 10;
-        //                            }
-        //                            else {
-        //                                set.scoreTally += self.validateNumber(self.games[gameId].sets[key+1].first) + self.validateNumber(self.games[gameId].sets[key+1].second);
-        //                            }
-        //                        }
-//
-//
-        //                    }
-        //                }
-        //                else if(set.first !== ''){
-        //                    //set.scoreTally = parseInt(set.first);
-        //                    if(set.second !== '' && (!self.validateStrike(set.second) && !self.validateSpare(set.second))) {
-        //                        set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
-        //                    }
-        //                    else if(self.validateSpare(set.second)) {
-        //                        set.scoreTally = self.validateNumber(parseInt(set.first)) + self.returnTotalScoreForNextThrowInterval(gameId, 8, 1);
-        //                    }
-        //                }
-        //            }
-//
-        //            //if no strike or spare in 10th frame, then no bonus roll
-        //            if((self.validateStrike(set.first) || self.validateStrike(set.second)) || self.validateSpare(set.second)) {
-        //                //Bonus roll!
-        //                if(self.validateStrike(set.first)) {
-        //                    set.scoreTally = 10;
-        //                    if(self.validateStrike(set.second)) {
-        //                        set.scoreTally += 10;
-        //                        if(self.validateStrike(set.third)) {
-        //                            set.scoreTally += 10;
-        //                        }
-        //                    }
-        //                    else {
-        //                        set.scoreTally += parseInt(set.second);
-        //                        if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
-        //                            set.scoreTally +=10;
-        //                        }
-        //                        else {
-        //                            set.scoreTally += self.validateNumber(parseInt(set.third));
-        //                        }
-        //                    }
-        //                }
-        //                else if(set.first !== '' && self.validateSpare(set.second)) {
-        //                    set.scoreTally = 10;
-        //                    if(self.validateStrike(set.third) || self.validateSpare(set.third)) {
-        //                        set.scoreTally +=10;
-        //                    }
-        //                }
-        //            }
-        //            else {
-        //                set.scoreTally = self.validateNumber(parseInt(set.first)) + self.validateNumber(parseInt(set.second));
-        //            }
-        //            if(key !== 0) {
-        //                set.setTotal = set.scoreTally + self.games[gameId].sets[key-1].setTotal;
-        //            }
-//
-        //        }
-//
-        //        console.log(set.scoreTally);
-//
-//
-        //    });
-
-            //The 10th set will work differently
-       // }
-
-
+        }
     }
     ]
 });
