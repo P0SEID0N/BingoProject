@@ -15,5 +15,7 @@ use Illuminate\Http\Request;
 
 Route::post('new-game', 'gamesController@storeNewGame');
 
+Route::get('game-history', 'gamesController@getGames');
+
 //Route::get('game', 'gamesController@getGameById');
 

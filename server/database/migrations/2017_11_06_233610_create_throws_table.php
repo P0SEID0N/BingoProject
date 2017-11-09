@@ -13,11 +13,12 @@ class CreateThrowsTable extends Migration
      */
     public function up()
     {
-        Schema::create('throwsController', function (Blueprint $table) {
+        Schema::create('throws', function (Blueprint $table) {
             $table->increments('throwid');
-            $table->integer('setid');
-            $table->integer('throwValue');
+            $table->integer('sets_id')->unsigned();
+            $table->char('throwValue', 2)->nullable();
             $table->timestamps();
+            $table->foreign('sets_id')->references('setid')->on('sets');
         });
 
         //Schema::table('throwsController', function($table) {
@@ -32,6 +33,6 @@ class CreateThrowsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('throwsController');
+        Schema::dropIfExists('throws');
     }
 }

@@ -13,16 +13,17 @@ class CreateSetsTable extends Migration
      */
     public function up()
     {
-        Schema::create('setsController', function (Blueprint $table) {
+        Schema::create('sets', function (Blueprint $table) {
             $table->increments('setid');
-            $table->integer('gameid');
+            $table->integer('games_id')->unsigned();
             $table->integer('setScore');
             $table->timestamps();
+            //$table->foreign('games_id')->references('gameid')->on('games');
         });
 
-        //Schema::table('setsController', function($table) {
-        //    $table->foreign('gameid')->references('gameid')->on('games');
-        //});
+       Schema::table('sets', function($table) {
+           $table->foreign('games_id')->references('gameid')->on('games');
+       });
     }
 
     /**
@@ -32,6 +33,6 @@ class CreateSetsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('setsController');
+        Schema::dropIfExists('sets');
     }
 }

@@ -15,9 +15,11 @@ class CreateGamesTable extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->increments('gameid');
-            $table->integer('userid');
+            $table->integer('users_id')->unsigned()->nullable();
             $table->integer('totalScore');
             $table->timestamps();
+//
+            //$table->foreign('users_id')->references('userid')->on('users');
         });
 
         //Schema::table('games', function($table) {

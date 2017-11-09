@@ -8,13 +8,18 @@ angular.module('gameHistory').component('gameHistory', {
         self.games = [];
 
         self.$onInit = function() {
+
+
             $http({
                 method: 'GET',
-                url: 'http://localhost:8000/gamehistory'
+                url: 'http://www.localhost:8000/api/game-history'
             }).then(function successCallback(response) {
                 // this callback will be called asynchronously
                 // when the response is available
-                console.log(response);
+                //self.games.push(response.data);
+                angular.forEach(response.data, function(value, key) {
+                    self.games.push(value);
+                });
             }, function errorCallback(response) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.

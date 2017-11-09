@@ -152,7 +152,7 @@ angular.module('scoreBoard').component('scoreBoard', {
                     self.game[self.game.length - 1].frames.push(temp);
                 }
 
-                console.log(self.game);
+                console.log(angular.toJson(self.game));
 
 
         };
@@ -164,7 +164,7 @@ angular.module('scoreBoard').component('scoreBoard', {
 
             $http({
                 method: 'POST',
-                url: 'http://localhost:8000/storegame',
+                url: 'http://localhost:8000/api/new-game',
                 data: payload
             }).then(function successCallback(response) {
                 // this callback will be called asynchronously
