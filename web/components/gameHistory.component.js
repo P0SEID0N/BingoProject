@@ -2,17 +2,26 @@ import './gameHistory.module';
 
 angular.module('gameHistory').component('gameHistory', {
     templateUrl: './components/gameHistory.template.html',
-    controller: ['$http','$scope', function GameHistoryController($http, $scope) {
+    controller: ['$http','$scope', 'API_ROUTE', function GameHistoryController($http, $scope, API_ROUTE) {
         let self = this;
 
         self.games = [];
 
         self.$onInit = function() {
+            self.fetchData();
+        };
 
+        $scope.$on("GAME_CREATED", function(){
+            self.fetchData();
+        });
+
+        self.fetchData = function() {
+
+            self.games = [];
 
             $http({
                 method: 'GET',
-                url: 'http://www.localhost:8000/api/game-history'
+                url: API_ROUTE+'api/game-history'
             }).then(function successCallback(response) {
                 // this callback will be called asynchronously
                 // when the response is available

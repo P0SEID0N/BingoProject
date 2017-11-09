@@ -1,3 +1,4 @@
 import angular from 'angular';
+import './configuration.module';
 
-angular.module('gameHistory', []);
+angular.module('gameHistory', ['constant']);

@@ -2,70 +2,12 @@ import './scoreBoard.module';
 
 angular.module('scoreBoard').component('scoreBoard', {
     templateUrl: './components/scoreBoard.template.html',
-    controller: ['$scope', '$http', function ScoreBoardController($scope, $http) {
+    controller: ['$scope', '$rootScope', '$http', 'API_ROUTE', function ScoreBoardController($scope, $rootScope, $http, API_ROUTE) {
         let self = this;
 
-        //self.player = "Stephen Krieg";
-        //self.game =[{}];
-
-       // self.game = [{
-       //     playerName: 'test',
-       //     frames:[],
-       // }];
-//
-        //self.game[1] = {
-        //    playerName: 'test2',
-        //    frames:[],
-        //};
-
-        //This is game's structure
-        //self.game = [{
-        //    playerName: 'TEST',
-        //    frames: [{
-        //        throws: [{
-        //            first:0,
-        //            second:0,
-        //            third:0
-        //        }],
-        //        score: 0,
-        //        frameNum: 0
-        //    }]
-        //}];
         self.$onInit = function () {
 
             self.game = [];
-
-           //self.addGame("SUCK MY DICK");
-            //for(let i = 0; i<10; i++) {
-            //    let temp = {
-            //        throws: {
-            //            first:0,
-            //            second:0,
-            //            third:0
-            //        },
-            //        score: 0,
-            //        frameNum: i
-            //    };
-//
-            //    self.game[0].frames.push(temp);
-            //}
-//
-            //for(let j = 0; j<10; j++) {
-            //    let temp = {
-            //        throws: {
-            //            first:0,
-            //            second:0,
-            //            third:0
-            //        },
-            //        score: 0,
-            //        frameNum: j
-            //    };
-//
-            //    self.game[1].frames.push(temp);
-            //}
-
-
-
         };
 
         self.convertScoreValue = function(_value) {
@@ -164,13 +106,14 @@ angular.module('scoreBoard').component('scoreBoard', {
 
             $http({
                 method: 'POST',
-                url: 'http://localhost:8000/api/new-game',
+                url: API_ROUTE+'api/new-game',
                 data: payload
             }).then(function successCallback(response) {
                 // this callback will be called asynchronously
                 // when the response is available
                 //BROADCAST A RELOAD TO THE "GAMEHISTORY COMPONENT"
                 console.log(response);
+                $rootScope.$broadcast("GAME_CREATED");
             }, function errorCallback(response) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
