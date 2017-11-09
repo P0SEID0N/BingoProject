@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    <div class="row" style="margin-top:230px;">
+    <div class="row" style="margin-top:130px;">
         <div class="col-md-1"></div>
         <div class="col-md-10">
             <div class="container-fluid scoreboard">
@@ -20,12 +20,12 @@
                             <div class="col-md-1">8</div>
                             <div class="col-md-1">9</div>
                             <div class="col-md-2">10</div>
-                            <div class="col-md-1">Score</div>
+                            <div class="col-md-1">Send Score</div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="game col-md-12" ng-repeat="(i,game) in $ctrl.game track by $index">
+                    <div class="row game col-md-12" ng-repeat="game in $ctrl.game track by $index">
                         <div class="playerName col-md-2">
                             <div class="col-md-12">{{game.playerName}}</div>
                         </div>
@@ -37,12 +37,43 @@
                                 <div class="col-md-12 setTotal">{{frame.score}}</div>
                             </div>
 
-                            <div class="col-md-1">Score</div>
+                            <div class="col-md-1">
+                                <button class="btn" style="color:black;" value="Send" ng-click="$ctrl.sendScore(game)">Send</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-1"></div>
+    </div>
+    <div class="row" style="margin-top:30px;">
+        <div class="col-md-12">
+            <div class="col-md-6 center-block" style="float:none;">
+                <div class="col-md-offset-5 col-md-3">
+                    <div class="form-login">
+                        <h4>Add Game</h4>
+                        <input type="text" id="userName" class="form-control input-sm chat-input darkTheme" placeholder="Name" ng-model="nameVal" />
+                        </br>
+                        <div class="wrapper">
+                        <span class="group-btn">
+                            <a href="" class="btn btn-md darkTheme" ng-click="$ctrl.addGame(nameVal)">Add Game</a>
+                         </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:30px;" >
+        <a class="btn btn-md darkTheme col-md-6 center-block" style="float:none;" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample" ">
+            Recorded Games
+        </a>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body" style="color:white;">
+                <game-history></game-history>
+            </div>
+        </div>
     </div>
 </div>

@@ -2,19 +2,21 @@ import './scoreBoard.module';
 
 angular.module('scoreBoard').component('scoreBoard', {
     templateUrl: './components/scoreBoard.template.html',
-    controller: [function ScoreBoardController($scope) {
+    controller: ['$scope', '$http', function ScoreBoardController($scope, $http) {
         let self = this;
 
         //self.player = "Stephen Krieg";
-        self.game = [{
-            playerName: 'test',
-            frames:[],
-        }];
+        //self.game =[{}];
 
-        self.game[1] = {
-            playerName: 'test2',
-            frames:[],
-        };
+       // self.game = [{
+       //     playerName: 'test',
+       //     frames:[],
+       // }];
+//
+        //self.game[1] = {
+        //    playerName: 'test2',
+        //    frames:[],
+        //};
 
         //This is game's structure
         //self.game = [{
@@ -31,35 +33,36 @@ angular.module('scoreBoard').component('scoreBoard', {
         //}];
         self.$onInit = function () {
 
+            self.game = [];
 
-
-            for(let i = 0; i<10; i++) {
-                let temp = {
-                    throws: {
-                        first:0,
-                        second:0,
-                        third:0
-                    },
-                    score: 0,
-                    frameNum: i
-                };
-
-                self.game[0].frames.push(temp);
-            }
-
-            for(let j = 0; j<10; j++) {
-                let temp = {
-                    throws: {
-                        first:0,
-                        second:0,
-                        third:0
-                    },
-                    score: 0,
-                    frameNum: j
-                };
-
-                self.game[1].frames.push(temp);
-            }
+           //self.addGame("SUCK MY DICK");
+            //for(let i = 0; i<10; i++) {
+            //    let temp = {
+            //        throws: {
+            //            first:0,
+            //            second:0,
+            //            third:0
+            //        },
+            //        score: 0,
+            //        frameNum: i
+            //    };
+//
+            //    self.game[0].frames.push(temp);
+            //}
+//
+            //for(let j = 0; j<10; j++) {
+            //    let temp = {
+            //        throws: {
+            //            first:0,
+            //            second:0,
+            //            third:0
+            //        },
+            //        score: 0,
+            //        frameNum: j
+            //    };
+//
+            //    self.game[1].frames.push(temp);
+            //}
 
 
 
@@ -92,7 +95,6 @@ angular.module('scoreBoard').component('scoreBoard', {
                 return true;
             }
             else {
-                console.log(_value);
                 return false;
             }
         };
@@ -124,7 +126,56 @@ angular.module('scoreBoard').component('scoreBoard', {
             }
         };
 
-        self.addGame = function (playerName) {
+        self.addGame = function (_name) {
+
+               if(_name === '' || _name === undefined) {
+                   _name = "Player"+ self.game.length;
+               }
+
+               let tempGame = {
+                    playerName: _name,
+                    frames:[]
+                };
+                self.game.push(tempGame);
+
+                for(let j = 0; j<10; j++) {
+                    let temp = {
+                        throws: {
+                            first:0,
+                            second:0,
+                            third:0
+                        },
+                        score: 0,
+                        frameNum: j
+                    };
+
+                    self.game[self.game.length - 1].frames.push(temp);
+                }
+
+                console.log(self.game);
+
+
+        };
+
+        self.sendScore = function(_game) {
+            console.log(_game);
+
+            let payload = angular.toJson(_game);
+
+            $http({
+                method: 'POST',
+                url: 'http://localhost:8000/storegame',
+                data: payload
+            }).then(function successCallback(response) {
+                // this callback will be called asynchronously
+                // when the response is available
+                //BROADCAST A RELOAD TO THE "GAMEHISTORY COMPONENT"
+                console.log(response);
+            }, function errorCallback(response) {
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+                console.log("Unable to send score data");
+            });
         };
 
         //calculate the values of the next two throws, add them and return.

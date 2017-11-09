@@ -1,10 +1,14 @@
 @import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css');
 
+body {
+    background-color:#333333;
+}
 
 .scoreboard {
     min-height: 400px;
     background-color: black;
     color: white;
+    padding-bottom:20px;
 }
 
 .scoreboardHeader {
@@ -34,4 +38,25 @@
 .game {
     margin-top:3px;
     margin-bottom:3px;
+}
+
+.form-login {
+    text-align:center;
+    margin-bottom:30px;
+    color:white;
+}
+
+.form-login a {
+    text-decoration: none;
+    color:white;
+}
+
+.form-login a:hover {
+    text-decoration: none;
+    color: #666666;
+}
+
+.darkTheme {
+    background-color:black;
+    color:white;
 }
